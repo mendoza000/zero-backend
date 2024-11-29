@@ -14,15 +14,16 @@ datasource db {
 }
 
 model ProductVariant {
-  id          String  @id @default(uuid())
-  name        String
-  price       Float
-  color       String?
-  size        String?
-  quantity    Int
-  isAvailable Boolean @default(true)
-  productId   String
-  product     Product @relation(fields: [productId], references: [id])
+  id                  String                @id @default(uuid())
+  name                String
+  price               Float
+  color               String?
+  size                String?
+  quantity            Int
+  isAvailable         Boolean               @default(true)
+  productId           String
+  product             Product               @relation(fields: [productId], references: [id])
+  OrderProductVariant OrderProductVariant[]
 }
 
 model Product {
@@ -33,4 +34,35 @@ model Product {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   variants    ProductVariant[]
+}
+
+model Order {
+  id        String                @id @default(uuid())
+  total     Float
+  status    String
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  clientId  String
+  client    Client                @relation(fields: [clientId], references: [id])
+  products  OrderProductVariant[] // Relación con la tabla intermedia
+}
+
+model OrderProductVariant {
+  id               String         @id @default(uuid())
+  orderId          String
+  productVariantId String
+  quantity         Int // Cantidad específica de este producto en la orden
+  order            Order          @relation(fields: [orderId], references: [id])
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  dni       String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
 }
